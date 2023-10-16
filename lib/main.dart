@@ -1,69 +1,62 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class User {
-  String name;
-  DateTime dateOfBirth;
-
-  User({required this.name, required this.dateOfBirth});
-}
-
-class UserNotifier extends StateNotifier<User> {
-  UserNotifier()
-      : super(User(name: 'Duongherotey', dateOfBirth: DateTime.now()));
-
-  void setName(String name) {
-    state = User(name: name, dateOfBirth: state.dateOfBirth);
-  }
-}
-
-final userProvider = StateNotifierProvider((ref) => UserNotifier());
-
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return ProviderScope(
       child: MaterialApp(
-          debugShowCheckedModeBanner: false,
-          title: 'User Example',
-          theme: ThemeData(
-            colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-            useMaterial3: true,
+        debugShowCheckedModeBanner: false,
+        title: 'User Example',
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+          useMaterial3: true,
+        ),
+        home:const  Scaffold(
+          body: SelectedButton(),
+        ),
+      ),
+    );
+  }
+}
+
+final isRedProvider = Provider<bool>((ref) {
+  final color = ref.watch(selectedButtonProvider);
+  return color == 'red';
+});
+final selectedButtonProvider = StateProvider<String>((ref) => '');
+
+class SelectedButton extends ConsumerWidget {
+  const SelectedButton({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isRed = ref.watch(isRedProvider);
+    final selectedBoutton = ref.watch(selectedButtonProvider);
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Text(selectedBoutton),
+          ElevatedButton(
+            onPressed: () =>
+                ref.read(selectedButtonProvider.notifier).state = 'red',
+            child: const Text('red'),
           ),
-          home: Scaffold(
-            appBar: AppBar(
-              title: Text('User Example'),
-            ),
-            body: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  // Consumer(builder: (context, watch, child) {
-                  // //  final user = watch(userProvider);
-                  //   //return Text(user.name);
-                  //   return print('0');
-                  // }
-                  // ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  TextButton(
-                      onPressed: () {
-                        // context.read(userProvider.notifier).setName('NakDuongherotey');
-                      },
-                      child: const Text(
-                        'change Name',
-                        style:
-                            TextStyle(fontSize: 20, color: Colors.amberAccent),
-                      )),
-                ],
-              ),
-            ),
-          )),
+          ElevatedButton(
+              onPressed: () =>
+                  ref.read(selectedButtonProvider.notifier).state = 'blue',
+              child: const Text('Blue')),
+          isRed ? Text('Color is red') : Text('Color is blue')
+        ],
+      ),
     );
   }
 }
